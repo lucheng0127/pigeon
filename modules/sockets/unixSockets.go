@@ -39,6 +39,7 @@ func checkError(err error, exit bool) {
 }
 
 func handleUnixConn(conn *net.UnixConn, msg chan string) {
+	// Get msg from conn and send to msg
 	buf := make([]byte, 64)
 	var dataString string
 
@@ -66,6 +67,7 @@ func handleUnixConn(conn *net.UnixConn, msg chan string) {
 }
 
 func (us *UnixSocket) listen() {
+	// Start unix socket server
 	if _, err := os.Stat(us.SocketFile); err == nil {
 		err := os.Remove(us.SocketFile)
 		checkError(err, true)
@@ -79,20 +81,21 @@ func (us *UnixSocket) listen() {
 
 	for {
 		// This's only one conn each time
-		msg := make(chan string)
+		msg := make(chan string) // Use msg channel transfer socket data
 		conn, err := l.AcceptUnix()
 		checkError(err, false)
 		log.Log.Info("Get new conn")
 
+		// Get msg from conn and send to msg
 		go handleUnixConn(conn, msg)
-		taskRst := make(chan string)
+		taskRst := make(chan string) // Use taskRst channel to get task result
 		select {
 		case taskInfo := <-msg:
 			log.Log.Infof("Get %s from conn", taskInfo)
 			go tasks.TaskManage(taskInfo, taskRst)
 		}
 		select {
-		case ts := <-taskRst:
+		case ts := <-taskRst: // If taskRst send back to socket connection
 			log.Log.Infof("Send %s to conn", ts)
 			_, err = conn.Write([]byte(ts))
 			checkError(err, false)
