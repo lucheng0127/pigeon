@@ -14,3 +14,4 @@ clean:
 deps:
 	$(GOGET) "github.com/sirupsen/logrus"
 	$(GOGET) "github.com/spf13/cobra
+	$(GOCMD) "github.com/olekukonko/tablewriter"

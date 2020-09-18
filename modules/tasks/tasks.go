@@ -5,7 +5,6 @@ import (
 	"pigeon/pigeond/log"
 	"strings"
 	"sync"
-	"time"
 )
 
 // Task struct
@@ -32,10 +31,8 @@ func taskProxy(task *Task, wg *sync.WaitGroup) {
 	// Do task with task name and args
 	switch task.Name {
 	case "LIST_SCRIPTS":
-		time.Sleep(3 * time.Second)
 		task.ExitCode, task.Result = ListScript()
 	case "ADD_SCRIPT":
-		time.Sleep(3 * time.Second)
 		task.ExitCode = 0
 		task.Result = "Add script succeed"
 	default:

@@ -15,6 +15,7 @@ socket server中获取到指令后执行对于的task，并返回task
 执行结果。执行结果通过socket connection返回给pigeon。
 Task执行结果以json格式返回。结果通过pigeon/cmd/utils.go
 中的checkJSONRst将json数据解析成map。
+scripts清单数据保存与/var/run/pigeon/scirpt_inventory.csv
 
 指令格式：
 
