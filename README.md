@@ -25,3 +25,8 @@ scripts清单数据保存与/var/run/pigeon/scirpt_inventory.csv
 * Task 执行的任务，需要在modules/tasks/tasks.go里面的taskProxy中注册
 * Args 参数
 * END 标志指令结束
+
+TODO:
+
+1. 处理Socket连接时，定义一个socket连接池
+2. 重构错误处理和日志收集
