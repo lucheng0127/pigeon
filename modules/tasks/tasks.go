@@ -33,8 +33,21 @@ func taskProxy(task *Task, wg *sync.WaitGroup) {
 	case "LIST_SCRIPTS":
 		task.ExitCode, task.Result = ListScript()
 	case "ADD_SCRIPT":
-		task.ExitCode = 0
-		task.Result = "Add script succeed"
+		if len(task.Args) != 4 {
+			task.ExitCode = 1
+			task.Result = "Command error"
+		}
+		name := strings.ReplaceAll(task.Args[0], "+", " ")
+		file := task.Args[1]
+		fType := ""
+		if task.Args[2] != "+" {
+			fType = task.Args[2]
+		}
+		passwd := ""
+		if task.Args[3] != "+" {
+			passwd = task.Args[3]
+		}
+		task.ExitCode, task.Result = AddScript(name, file, fType, passwd)
 	default:
 		log.Log.Infof("No task for command %s", task.Name)
 		task.ExitCode = 1

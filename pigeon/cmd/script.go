@@ -16,6 +16,8 @@ import (
 // List scritp command flags
 var name string
 var scriptFile string
+var scriptFileType string
+var passwd string
 var pigeonSocket = sockets.UnixSocket{SocketFile: "/var/run/pigeon/pigeond.socket"}
 
 func loadCSV(rawData string) [][]string {
@@ -51,7 +53,28 @@ var scriptAddCmd = &cobra.Command{
 	Short: "Add script",
 	Long:  "Add script into script inventory",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Add script %s with script file %s", name, scriptFile)
+		// Replace space to + in name
+		name = strings.ReplaceAll(name, " ", "+")
+
+		cmdStr := fmt.Sprintf("F ADD_SCRIPT %s %s", name, scriptFile)
+		if scriptFileType != "" {
+			cmdStr += fmt.Sprintf(" %s", scriptFileType)
+		} else {
+			cmdStr += " +"
+		}
+		if passwd != "" {
+			cmdStr += fmt.Sprintf(" %s", passwd)
+		} else {
+			cmdStr += " +"
+		}
+		cmdStr += " END"
+		rst := sockets.Send(&pigeonSocket, cmdStr)
+		rstData, _ := checkJSONRst(rst)
+		ec := fmt.Sprint(rstData["ExitCode"])
+		if ec == "1" {
+			fmt.Print("Failed: ")
+		}
+		fmt.Println(rstData["Result"])
 	},
 }
 
@@ -61,4 +84,6 @@ func init() {
 	scriptAddCmd.MarkFlagRequired("name")
 	scriptAddCmd.Flags().StringVarP(&scriptFile, "file", "f", "", "Script file (required)")
 	scriptAddCmd.MarkFlagRequired("file")
+	scriptAddCmd.Flags().StringVarP(&scriptFileType, "type", "t", "", "Script compress type tar/zip")
+	scriptAddCmd.Flags().StringVarP(&passwd, "passwd", "p", "", "Script compress password")
 }
